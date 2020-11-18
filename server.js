@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import User from '.models/User';
+import auth from './middleware/auth';
 
 
 
@@ -100,3 +101,16 @@ app.post(
 // Connection listener
 const port = 5000;
 app.listen(port, () => console.log(`Express server running on port ${port}`));
+
+/**
+ * @route GET api/auth
+ * @desc Authenticate user
+ */
+app.get('/api/auth', auth, async (req, res) => {
+    try{
+        const user = await User.findById(req.user.id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).send('Unknown server error');
+    }
+});
