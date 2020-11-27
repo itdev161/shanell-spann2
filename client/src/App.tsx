@@ -6,6 +6,8 @@ import Register from './components/Register/Register';
 import Login from './components/Login/Login';
 import PostList from './components/PostList/PostList';
 import Post from './components/Post/Post';
+import CreatePost from './components/Post/CreatePost';
+import EditPost from './components/Post/EditPost';
 class App extends React.Component {
   state = {
     posts: [],
@@ -122,12 +124,47 @@ class App extends React.Component {
         });
     }
   };
+
+  editPost = post => {
+    this.setState({
+      post: post
+    });
+  };
+
+  onPostCreated = post => {
+    const newPosts = [...this.state.posts, post];
+
+    this.setState({
+      posts: newPosts
+    });
+  };
+
+  onPostCreated = post => {
+    const newPosts = [...this.state.posts, post];
+
+    this.setState({
+      posts: newPosts
+    });
+  };
+
+  onPostUpdated = post => {
+    console.log('updated post: ', post);
+    const newPosts = [...this.state.posts];
+    const index = newPosts.findIndex(p => p._id === post._id);
+
+    newPosts[index] = post;
+
+    this.setState({
+      posts: newPosts
+    });
+  };
   
   render() {
-    let { user, posts }  = this.state;
+    let { user, posts, post, token }  = this.state;
     const authProps = {
       authenticateUser: this.authenticateUser
     };
+
     return (
       <Router>
         <div className="App">
@@ -138,7 +175,11 @@ class App extends React.Component {
                 <Link to="/">Home</Link>
               </li>
               <li>
-                <Link to="/register">Register</Link>
+                {user ? (
+                  <Link to="/new-post">New Post</Link>
+                ) : (
+                  <Link to="/register">Register</Link>
+                )}
               </li>
               <li>
                 {user ?
@@ -159,6 +200,7 @@ class App extends React.Component {
                       posts={posts} 
                       clickPost={this.viewPost}
                       deletePost={this.deletePost} 
+                      editPost={this.editPost}
                       />
                   </React.Fragment>
                 ) : (
@@ -167,6 +209,16 @@ class App extends React.Component {
               </Route>
               <Route path="/posts/:postId">
                 <Post post={post} />
+              </Route>
+              <Route path ="/new-post">
+                <CreatePost token={token} onPostCreated={this.onPostCreated} />
+              </Route>
+              <Route path="/edit-post/:postId">
+                <EditPost
+                token={token}
+                post={post}
+                onPostUpdated={this.onPostUpdated}
+                />
               </Route>
               <Route
               exact
